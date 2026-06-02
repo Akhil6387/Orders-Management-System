@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
 
     # CORS
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,https://frontend-delta-six-7u6rtt6hz3.vercel.app,https://orders-management-system.vercel.app"
 
     @property
     def cors_origins(self) -> list[str]:
