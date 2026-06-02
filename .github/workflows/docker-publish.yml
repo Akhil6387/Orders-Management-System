@@ -25,5 +25,5 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            akhil6387/order-management-system:latest
-            akhil6387/order-management-system:${{ github.sha }}
+            akhilyadav012/akhil6387:latest
+            akhilyadav012/akhil6387:${{ github.sha }}
