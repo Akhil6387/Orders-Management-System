@@ -1,0 +1,51 @@
+[tool.pytest.ini_options]
+# Run from the backend/ directory: pytest
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--color=yes",
+    "--cov=app",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml:coverage.xml",
+    "--cov-fail-under=80",
+]
+markers = [
+    "unit: pure unit tests (no HTTP, no DB I/O)",
+    "integration: tests that exercise HTTP endpoints",
+    "slow: tests that take more than 1 second",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "app/__init__.py",
+    "app/database/__init__.py",
+    "app/models/__init__.py",
+    "app/schemas/__init__.py",
+    "app/repositories/__init__.py",
+    "app/services/__init__.py",
+    "app/api/__init__.py",
+    "app/api/routes/__init__.py",
+    "app/utils/__init__.py",
+    "app/core/__init__.py",
+    "alembic/*",
+]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "@(abc\\.)?abstractmethod",
+]

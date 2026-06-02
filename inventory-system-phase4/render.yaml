@@ -1,0 +1,42 @@
+# render.yaml — Render.com Blueprint
+# Deploys the FastAPI backend as a Web Service.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: inventory-backend
+    runtime: python
+    region: oregon           # change to your preferred region
+    plan: starter            # free | starter | standard | pro
+
+    rootDir: backend
+
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+
+    startCommand: |
+      alembic upgrade head
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 2
+
+    healthCheckPath: /health
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: inventory-postgres
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true          # Render auto-generates a random value
+      - key: CORS_ORIGINS
+        value: "https://inventory-frontend.vercel.app"
+
+databases:
+  - name: inventory-postgres
+    databaseName: inventory_db
+    plan: starter
+    region: oregon

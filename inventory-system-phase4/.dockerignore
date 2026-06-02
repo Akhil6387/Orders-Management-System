@@ -1,0 +1,46 @@
+# ============================================================
+# Root .dockerignore — applies to docker-compose build context
+# Each service also has its own Dockerfile context.
+# ============================================================
+
+# Version control
+.git/
+.gitignore
+
+# Secrets — never bake into images
+.env
+.env.*
+!.env.example
+
+# Documentation
+README.md
+docs/
+*.md
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python artifacts
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
+**/dist/
+**/build/
+**/.pytest_cache/
+**/.mypy_cache/
+**/htmlcov/
+**/.coverage
+
+# Node artifacts
+**/node_modules/
+**/dist/
+**/build/
+**/.cache/
+
+# Docker-in-Docker (avoid recursion)
+docker-compose.override.yml

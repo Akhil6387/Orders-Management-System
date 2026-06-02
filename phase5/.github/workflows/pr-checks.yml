@@ -1,0 +1,77 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+
+  # Quick lint + unit-only run (no Postgres, no Docker) so PR feedback is fast
+  quick-backend:
+    name: "Backend · Lint + Unit Tests"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install
+        run: pip install -r requirements.txt black isort flake8 pytest-cov
+
+      - name: Lint
+        run: |
+          black --check .
+          isort --check-only .
+          flake8 . --max-line-length=100 --extend-ignore=E203,W503
+
+      - name: Unit tests (SQLite, fast)
+        env:
+          TEST_DATABASE_URL: "sqlite:///:memory:"
+        run: |
+          pytest tests/ \
+            -v --tb=short \
+            --ignore=tests/test_api_integration.py \
+            --cov=app --cov-report=term-missing --cov-fail-under=75
+
+  quick-frontend:
+    name: "Frontend · Lint + Build"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Build
+        env:
+          VITE_API_URL: /api
+        run: npm run build
